@@ -2,13 +2,13 @@
 Install with npm:
 
 ```bash
-npm install --save-dev jsbridge
+npm install --save-dev nsjs-bridge
 ```
 
 Install with yarn:
 
 ```bash
-yarn add jsbridge --dev
+yarn add nsjs-bridge --dev
 ```
 
 
