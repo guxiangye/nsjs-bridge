@@ -24,12 +24,14 @@ Vue.use(JSBridgePlugin, bridgeConfig);
 3.调用
 this.$jsBridge.example1(dict, function (data) {
     alert('js-bridge:' + JSON.stringify(data))
+}
 ```
 
 iOS 部分:
 ```angular2html
 在iOS中通过`WKWebView`的`WKScriptMessageHandler` 或`UIWebView`的`JSContext`绑定反调，
 有两种方式绑定，二选一即可：
+UIWebView
 1.单一绑定法，配置如下
 var native = {
     ios: 'ios',
@@ -59,6 +61,26 @@ context[@"example1"] = ^(NSString *class) {
 context[@"example2"] = ^(NSString *class) {
     [webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"getExample2('%@')", class]];
 };
+
+WKWebView
+1.单一绑定法，配置如下
+- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
+    if ([message.name isEqualToString:@"example1"]) {
+        NSString *js = [NSString stringWithFormat:@"getExample1(%@)", [YEAFNRequestManager dictionaryToJson:message.body]];
+        [self.webView stringByEvaluateJavaScript:js completionHandler:^(id  _Nullable result, NSError * _Nullable error) {
+            NSLog(@"%@ | %@", result, error.localizedDescription);
+        }];
+    }
+}
+2.多方法，配置如下
+- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
+    if ([message.name isEqualToString:@"ios"]) {
+        NSString *js = [NSString stringWithFormat:@"getPhoto(%@)", [YEAFNRequestManager dictionaryToJson:message.body]];
+        [self.webView stringByEvaluateJavaScript:js completionHandler:^(id  _Nullable result, NSError * _Nullable error) {
+            NSLog(@"%@ | %@", result, error.localizedDescription);
+        }];
+    }
+}
 ...
 ```
 
@@ -68,3 +90,5 @@ android:
 在Android中通过`webView.addJavascriptInterface(obj,'android')` 绑定反调；
 注意：为了安全考虑，`android` 可以替换成自己设置的方法名
 ```
+
+如您在使用过程中有任何建议或疑问，欢迎联系 guxiangyee@163.com
