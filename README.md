@@ -12,41 +12,59 @@ yarn add nsjs-bridge --dev
 ```
 
 
+js 部分:
 ```angular2html
-/**
- * js:
- * this.$jsBridge.photo(['colin', 'neil'], function (data) {
-          alert('js-bridge:' + JSON.stringify(data))
-        })
- *
- * ios:
- * 在iOS中通过`WKWebView`的`WKScriptMessageHandler` 或`UIWebView`的`JSContext`绑定反调，
- * 有两种方式绑定，二选一即可：
- * 1.单一绑定法，配置如下
- * var native = {
-      ios: 'ios',
-      android: 'android'
+1.vue-cli 的话，建议写在 main.js 中
+import JSBridgePlugin from './index.js'
+import bridgeConfig from './config/bridgeConfig.js'
+Vue.use(JSBridgePlugin, bridgeConfig);
+
+2.配置文件（./config/bridgeConfig.js）拖到项目工程中，路径已当前项目路径为准
+
+3.调用
+this.$jsBridge.example1(dict, function (data) {
+    alert('js-bridge:' + JSON.stringify(data))
+```
+
+iOS 部分:
+```angular2html
+在iOS中通过`WKWebView`的`WKScriptMessageHandler` 或`UIWebView`的`JSContext`绑定反调，
+有两种方式绑定，二选一即可：
+1.单一绑定法，配置如下
+var native = {
+    ios: 'ios',
+    android: 'android' (注意：为了安全考虑，`android` 可以替换成自己设置的方法名)
+}
+var methods = [{js: "example1", native: "getExample1"},{js: "example2", native: "getExample2"}]
+JSContext *context = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
+context[@"ios"] = ^(NSDictionary *dict) {
+    if ([dict[@"method"] isEqualTo:@"example1"]) {
+        [webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"getExample1(%@)", [YEAFNRequestManager dictionaryToJson:dict[@"parameter"]]]];
     }
- var methods = [{js: "photo", native: "getPhoto"},{js: "openWX", native: "getOpenWX"}]
-
- * JSContext *context = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
- * context[@"photo"] = ^(NSString *class) {
-        [webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"getPhoto('%@')", class]];
-    };
-
- context[@"ios"] = ^(NSDictionary *dict) {
-        [webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"getPhoto(%@)", [YEAFNRequestManager dictionaryToJson:dict[@"parameter"]]]];
-    };
-
- 2.多方法，配置如下
- var native = {
-      ios: '',
-      android: 'android'
+    if ([dict[@"method"] isEqualTo:@"example2"]) {
+        [webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"getExample2(%@)", [YEAFNRequestManager dictionaryToJson:dict[@"parameter"]]]];
     }
- var methods = [{js: "photo", native: "getPhoto"},{js: "openWX", native: "getOpenWX"}]
- *
- * android:
- * 在Android中通过`webView.addJavascriptInterface(obj,'android')` 绑定反调；
- * 注意：为了安全考虑，`android` 可以替换成自己设置的方法名
- * */
+};
+
+2.多方法，配置如下
+var native = {
+    ios: '',
+    android: 'android'
+}
+var methods = [{js: "example1", native: "getExample1"},{js: "example2", native: "getExample2"}]
+JSContext *context = [self.webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
+context[@"example1"] = ^(NSString *class) {
+    [webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"getExample1('%@')", class]];
+};
+context[@"example2"] = ^(NSString *class) {
+    [webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"getExample2('%@')", class]];
+};
+...
+```
+
+Android 部分:
+```angular2html
+android:
+在Android中通过`webView.addJavascriptInterface(obj,'android')` 绑定反调；
+注意：为了安全考虑，`android` 可以替换成自己设置的方法名
 ```
