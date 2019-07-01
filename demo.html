@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>nsjs-bridge</title>
+</head>
+<body>
+  <div id="demo">
+    <button  @click="jsBridgeTest">jsBridgeTest</button>
+  </div>
+</body>
+</html>
+<script src="./vue.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="module" charset="utf-8">
+
+  // 1.vue-cli 的话，建议写在 main.js 中
+  import JSBridgePlugin from './index.js'
+  import bridgeConfig from './config/bridgeConfig.js'
+  Vue.use(JSBridgePlugin, bridgeConfig);
+
+  // 2.配置文件（./config/bridgeConfig.js）拖到项目工程中，路径已当前项目路径为准
+
+  // 3.调用
+  /**this.$jsBridge.example1(dict, function (data) {
+    alert('js-bridge:' + JSON.stringify(data))
+  })
+  */
+
+  var vm = new Vue({
+    name: 'demo',
+    el: '#demo',
+    methods: {
+      jsBridgeTest() {
+        // 方式一：
+        let dict = {
+          name1: 'test1',
+          name2: 'test2'
+        }
+        // 方式二：
+        let cls = {}
+        cls.name1 = 'test1'
+        cls.name2 = 'test2'
+        // 方式三：
+        let arr = []
+        arr = ['test1', 'test2', 123]
+        // 方式四：
+        let str = 'test'
+
+        // 调用
+        this.$jsBridge.example1(dict /**cls,*/ /**arr,*/ /**str,*/ /**...*/, function (data) {
+          alert('js-bridge:' + JSON.stringify(data))
+        })
+      }
+    }
+  })
+
+</script>

@@ -1,0 +1,13 @@
+{
+  "name": "nsjs-bridge",
+  "version": "1.0.2",
+  "description": "ns js bridge",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["NSJSBridge", "nsjs-bridge", "nsjsbridge"],
+  "author": "guxiangyee",
+  "license": "ISC",
+  "files": ["index.js", "config/bridgeConfig.js"]
+}
